@@ -15,7 +15,7 @@ final class Conversation {
     var timestamp: Date
     var title: String
     var summary: String?
-    var isTitleGenerated: Bool
+    var isTitleGenerated: Bool = false
 
     @Relationship(deleteRule: .cascade, inverse: \ConversationMessage.conversation)
     var messages: [ConversationMessage]

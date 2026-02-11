@@ -9,10 +9,10 @@ import SwiftUI
 
 struct SettingsView: View {
     @State private var apiKey: String = ""
-    @AppStorage("ai_voice") private var selectedVoice: String = "alloy"
+    @AppStorage("ai_voice") private var selectedVoice: String = "random"
     @Environment(\.dismiss) private var dismiss
 
-    let availableVoices = ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+    let availableVoices = ["random", "alloy", "ash", "ballad", "cedar", "coral", "echo", "marin", "sage", "shimmer", "verse"]
 
     var body: some View {
         NavigationStack {
@@ -47,8 +47,18 @@ struct SettingsView: View {
                 Section {
                     Picker("Voice", selection: $selectedVoice) {
                         ForEach(availableVoices, id: \.self) { voice in
-                            Text(voice.capitalized).tag(voice)
+                            if voice == "random" {
+                                Text("Random").tag(voice)
+                            } else {
+                                Text(voice.capitalized).tag(voice)
+                            }
                         }
+                    }
+
+                    if selectedVoice == "random" {
+                        Text("A different voice will be chosen for each conversation")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 } header: {
                     Text("Voice Settings")

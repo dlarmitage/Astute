@@ -30,39 +30,57 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
-            VStack(spacing: 0) {
-                List(selection: $selectedConversation) {
-                    #if os(iOS)
-                    // On iPhone, show quick actions in the list itself
-                    Section {
-                        if apiKey.isEmpty {
-                            Button(action: { showSettings.toggle() }) {
-                                Label("Configure API Key", systemImage: "key")
-                                    .foregroundColor(.orange)
-                            }
-                        } else {
-                            Button(action: startManualConversation) {
-                                Label("Start New Conversation", systemImage: "plus.circle.fill")
-                            }
+            List(selection: $selectedConversation) {
+                #if os(iOS)
+                // On iPhone, show quick actions in the list itself
+                Section {
+                    if apiKey.isEmpty {
+                        Button(action: { showSettings.toggle() }) {
+                            Label("Configure API Key", systemImage: "key")
+                                .foregroundColor(.orange)
                         }
-                    }
-                    #endif
-
-                    Section {
-                        ForEach(filteredConversations) { conversation in
-                            NavigationLink(value: conversation) {
-                                ConversationRow(conversation: conversation)
-                            }
+                    } else {
+                        Button(action: startManualConversation) {
+                            Label("Start New Conversation", systemImage: "plus.circle.fill")
                         }
-                        .onDelete(perform: deleteConversations)
                     }
                 }
-                #if os(macOS)
-                .navigationSplitViewColumnWidth(min: 250, ideal: 300)
                 #endif
 
+                Section {
+                    ForEach(filteredConversations) { conversation in
+                        NavigationLink(value: conversation) {
+                            ConversationRow(conversation: conversation)
+                        }
+                    }
+                    .onDelete(perform: deleteConversations)
+                }
+            }
+            #if os(macOS)
+            .navigationSplitViewColumnWidth(min: 250, ideal: 300)
+            #endif
+            .safeAreaInset(edge: .top) {
+                HStack(spacing: 6) {
+                    Image(systemName: "magnifyingglass")
+                        .foregroundColor(.secondary)
+                    TextField("Search conversations", text: $searchText)
+                        .textFieldStyle(.plain)
+                    if !searchText.isEmpty {
+                        Button {
+                            searchText = ""
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(8)
+                .background(.bar)
+            }
+            .safeAreaInset(edge: .bottom) {
                 // Sidebar footer
-                VStack(spacing: 8) {
+                VStack(spacing: 0) {
                     Divider()
 
                     HStack {
@@ -80,10 +98,21 @@ struct ContentView: View {
                                 .help("API key not configured")
                                 #endif
                         }
+
+                        Button(action: { showDeleteAllConfirmation = true }) {
+                            Image(systemName: "trash")
+                                .foregroundColor(.secondary)
+                        }
+                        .buttonStyle(.borderless)
+                        .disabled(conversations.isEmpty)
+                        #if os(macOS)
+                        .help("Delete all conversations")
+                        #endif
                     }
                     .padding(.horizontal)
                     .padding(.vertical, 8)
                 }
+                .background(.bar)
             }
             .toolbar {
                 #if os(iOS)
@@ -91,18 +120,6 @@ struct ContentView: View {
                     EditButton()
                 }
                 #endif
-                ToolbarItem {
-                    Button(action: addConversation) {
-                        Label("New Conversation", systemImage: "plus")
-                    }
-                    .disabled(apiKey.isEmpty)
-                }
-                ToolbarItem {
-                    Button(action: { showDeleteAllConfirmation = true }) {
-                        Label("Delete All", systemImage: "trash")
-                    }
-                    .disabled(conversations.isEmpty)
-                }
             }
             .confirmationDialog(
                 "Delete All Conversations?",
@@ -117,16 +134,26 @@ struct ContentView: View {
                 Text("This will permanently delete all \(conversations.count) conversations. This cannot be undone.")
             }
             .navigationTitle("Astute")
-            .searchable(text: $searchText, prompt: "Search conversations")
         } detail: {
-            if let conversation = selectedConversation {
-                if !apiKey.isEmpty {
-                    ConversationView(conversation: conversation, apiKey: apiKey)
+            Group {
+                if let conversation = selectedConversation {
+                    if !apiKey.isEmpty {
+                        ConversationView(conversation: conversation, apiKey: apiKey)
+                            .id(conversation.id)
+                    } else {
+                        apiKeyRequiredView
+                    }
                 } else {
-                    apiKeyRequiredView
+                    placeholderView
                 }
-            } else {
-                placeholderView
+            }
+            .toolbar {
+                ToolbarItem(placement: .automatic) {
+                    Button(action: addConversation) {
+                        Label("New Conversation", systemImage: "plus")
+                    }
+                    .disabled(apiKey.isEmpty)
+                }
             }
         }
         .sheet(isPresented: $showSettings) {

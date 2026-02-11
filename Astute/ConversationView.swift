@@ -13,24 +13,26 @@ import AstuteMemory
 struct ConversationView: View {
     @Environment(\.modelContext) private var modelContext
     @StateObject private var voiceEngine: VoiceEngine
-    @AppStorage("ai_voice") private var selectedVoice: String = "alloy"
+    @AppStorage("ai_voice") private var selectedVoice: String = "random"
     @State private var isRecording = false
     @State private var showSettings = false
     @State private var messageText = ""
     @State private var isSendingText = false
-    /// Tracks the most recently emitted user message so its content can be
-    /// updated when the final Whisper transcription arrives.
-    @State private var lastUserMessage: ConversationMessage?
     /// Strong reference to keep the delegate alive (VoiceEngine holds it weakly).
     @State private var delegateBridge: ConversationBridge?
 
-    let conversation: Conversation
+    @Bindable var conversation: Conversation
     private let apiKey: String
+
+    private static let concreteVoices = ["alloy", "ash", "ballad", "cedar", "coral", "echo", "marin", "sage", "shimmer", "verse"]
 
     init(conversation: Conversation, apiKey: String) {
         self.conversation = conversation
         self.apiKey = apiKey
-        let voice = UserDefaults.standard.string(forKey: "ai_voice") ?? "alloy"
+        let voicePref = UserDefaults.standard.string(forKey: "ai_voice") ?? "random"
+        let voice = voicePref == "random"
+            ? Self.concreteVoices.randomElement()!
+            : voicePref
         let config = VoiceEngineConfiguration(
             apiKey: apiKey,
             voice: voice,
@@ -163,8 +165,7 @@ struct ConversationView: View {
             // Must store a strong reference — VoiceEngine.delegate is weak.
             let bridge = ConversationBridge(
                 conversation: conversation,
-                modelContext: modelContext,
-                lastUserMessage: $lastUserMessage
+                modelContext: modelContext
             )
             delegateBridge = bridge
             voiceEngine.delegate = bridge
@@ -339,12 +340,15 @@ private func generateMemory(
 private class ConversationBridge: VoiceEngineDelegate {
     let conversation: Conversation
     let modelContext: ModelContext
-    @Binding var lastUserMessage: ConversationMessage?
 
-    init(conversation: Conversation, modelContext: ModelContext, lastUserMessage: Binding<ConversationMessage?>) {
+    /// Tracks the most recently emitted user message so its content can be
+    /// updated when the final Whisper transcription arrives.
+    /// Owned directly by the bridge — no Binding needed.
+    private var lastUserMessage: ConversationMessage?
+
+    init(conversation: Conversation, modelContext: ModelContext) {
         self.conversation = conversation
         self.modelContext = modelContext
-        self._lastUserMessage = lastUserMessage
     }
 
     func voiceEngine(_ engine: VoiceEngine, didCompleteMessage message: VoiceMessage) {
@@ -368,7 +372,9 @@ private class ConversationBridge: VoiceEngineDelegate {
             aiMessage.conversation = conversation
             conversation.messages.append(aiMessage)
             modelContext.insert(aiMessage)
-            lastUserMessage = nil  // Clear — next user message is a new turn
+            // Note: do NOT clear lastUserMessage here — transcription.completed
+            // can arrive after response.done, and the update callback needs the
+            // reference to fix the "…" placeholder.
         }
 
         try? modelContext.save()
