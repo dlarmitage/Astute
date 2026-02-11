@@ -1,0 +1,19 @@
+# Xcode
+.DS_Store
+DerivedData/
+xcuserdata/
+*.xcscmblueprint
+
+# Swift Package Manager
+.build/
+.swiftpm/xcode/package.xcworkspace/contents.xcworkspacedata
+
+# CocoaPods (if ever used)
+Pods/
+
+# Credentials
+.netrc
+*.env
+
+# Archives
+*.zip

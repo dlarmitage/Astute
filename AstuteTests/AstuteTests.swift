@@ -5,12 +5,20 @@
 //  Created by David Armitage on 2/5/26.
 //
 
-import Testing
+import XCTest
+@testable import Astute
 
-struct AstuteTests {
+final class AstuteTests: XCTestCase {
 
-    @Test func example() async throws {
-        // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+    func testExample() async throws {
+        // Write your test here and use APIs like `XCTAssert(...)` to check expected conditions.
+        XCTAssertTrue(true)
+    }
+    
+    func testConversationCreation() async throws {
+        let conversation = Conversation()
+        XCTAssertEqual(conversation.title, "New Conversation")
+        XCTAssertTrue(conversation.messages.isEmpty)
     }
 
 }

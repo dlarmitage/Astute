@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		D3F1A1C12F3B000000957219 /* AstuteVoiceEngine in Frameworks */ = {isa = PBXBuildFile; productRef = D3F1A1C02F3B000000957219 /* AstuteVoiceEngine */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		D36341062F34E5D500298E8F /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,9 +33,22 @@
 		D363410F2F34E5D500298E8F /* AstuteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AstuteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		D3F2A1D02F3C000000957219 /* Exceptions for "Astute" folder in "Astute" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = D36340F52F34E5D200298E8F /* Astute */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		D36340F82F34E5D200298E8F /* Astute */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				D3F2A1D02F3C000000957219 /* Exceptions for "Astute" folder in "Astute" target */,
+			);
 			path = Astute;
 			sourceTree = "<group>";
 		};
@@ -52,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D3F1A1C12F3B000000957219 /* AstuteVoiceEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +130,7 @@
 			);
 			name = Astute;
 			packageProductDependencies = (
+				D3F1A1C02F3B000000957219 /* AstuteVoiceEngine */,
 			);
 			productName = Astute;
 			productReference = D36340F62F34E5D200298E8F /* Astute.app */;
@@ -195,6 +214,9 @@
 			);
 			mainGroup = D36340ED2F34E5D200298E8F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				D3F1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteVoiceEngine" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D36340F72F34E5D200298E8F /* Products */;
 			projectDirPath = "";
@@ -395,9 +417,23 @@
 				DEVELOPMENT_TEAM = ZTL3N8J879;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Astute/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Astute;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Astute needs access to your microphone to have voice conversations with AI.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -439,9 +475,23 @@
 				DEVELOPMENT_TEAM = ZTL3N8J879;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_INCOMING_NETWORK_CONNECTIONS = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_RESOURCE_ACCESS_AUDIO_INPUT = YES;
+				ENABLE_RESOURCE_ACCESS_BLUETOOTH = NO;
+				ENABLE_RESOURCE_ACCESS_CALENDARS = NO;
+				ENABLE_RESOURCE_ACCESS_CAMERA = NO;
+				ENABLE_RESOURCE_ACCESS_CONTACTS = NO;
+				ENABLE_RESOURCE_ACCESS_LOCATION = NO;
+				ENABLE_RESOURCE_ACCESS_PRINTING = NO;
+				ENABLE_RESOURCE_ACCESS_USB = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Astute/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Astute;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
+				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Astute needs access to your microphone to have voice conversations with AI.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -615,6 +665,21 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		D3F1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteVoiceEngine" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../AstuteVoiceEngine;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		D3F1A1C02F3B000000957219 /* AstuteVoiceEngine */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D3F1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteVoiceEngine" */;
+			productName = AstuteVoiceEngine;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = D36340EE2F34E5D200298E8F /* Project object */;
 }
