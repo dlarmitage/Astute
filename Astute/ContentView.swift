@@ -17,6 +17,16 @@ struct ContentView: View {
     @State private var showSettings = false
     @State private var columnVisibility: NavigationSplitViewVisibility = .detailOnly
     @State private var showDeleteAllConfirmation = false
+    @State private var searchText = ""
+
+    private var filteredConversations: [Conversation] {
+        guard !searchText.isEmpty else { return conversations }
+        let query = searchText.lowercased()
+        return conversations.filter { conv in
+            conv.title.lowercased().contains(query) ||
+            (conv.summary?.lowercased().contains(query) ?? false)
+        }
+    }
 
     var body: some View {
         NavigationSplitView(columnVisibility: $columnVisibility) {
@@ -39,7 +49,7 @@ struct ContentView: View {
                     #endif
 
                     Section {
-                        ForEach(conversations) { conversation in
+                        ForEach(filteredConversations) { conversation in
                             NavigationLink(value: conversation) {
                                 ConversationRow(conversation: conversation)
                             }
@@ -107,6 +117,7 @@ struct ContentView: View {
                 Text("This will permanently delete all \(conversations.count) conversations. This cannot be undone.")
             }
             .navigationTitle("Astute")
+            .searchable(text: $searchText, prompt: "Search conversations")
         } detail: {
             if let conversation = selectedConversation {
                 if !apiKey.isEmpty {
@@ -222,7 +233,7 @@ struct ContentView: View {
     private func deleteConversations(offsets: IndexSet) {
         withAnimation {
             for index in offsets {
-                modelContext.delete(conversations[index])
+                modelContext.delete(filteredConversations[index])
             }
         }
     }
@@ -245,6 +256,13 @@ struct ConversationRow: View {
             Text(conversation.title)
                 .font(.headline)
                 .lineLimit(1)
+
+            if let summary = conversation.summary {
+                Text(summary)
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .lineLimit(2)
+            }
 
             HStack {
                 Text(conversation.timestamp, format: .dateTime.month().day().hour().minute())

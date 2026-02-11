@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		D3F1A1C12F3B000000957219 /* AstuteVoiceEngine in Frameworks */ = {isa = PBXBuildFile; productRef = D3F1A1C02F3B000000957219 /* AstuteVoiceEngine */; };
+		D3M1A1C12F3B000000957219 /* AstuteMemory in Frameworks */ = {isa = PBXBuildFile; productRef = D3M1A1C02F3B000000957219 /* AstuteMemory */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +71,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D3F1A1C12F3B000000957219 /* AstuteVoiceEngine in Frameworks */,
+				D3M1A1C12F3B000000957219 /* AstuteMemory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +133,7 @@
 			name = Astute;
 			packageProductDependencies = (
 				D3F1A1C02F3B000000957219 /* AstuteVoiceEngine */,
+				D3M1A1C02F3B000000957219 /* AstuteMemory */,
 			);
 			productName = Astute;
 			productReference = D36340F62F34E5D200298E8F /* Astute.app */;
@@ -216,6 +219,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				D3F1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteVoiceEngine" */,
+				D3M1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteMemory" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = D36340F72F34E5D200298E8F /* Products */;
@@ -671,6 +675,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../AstuteVoiceEngine;
 		};
+		D3M1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteMemory" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../AstuteMemory;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -678,6 +686,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D3F1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteVoiceEngine" */;
 			productName = AstuteVoiceEngine;
+		};
+		D3M1A1C02F3B000000957219 /* AstuteMemory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D3M1A1BF2F3B000000957219 /* XCLocalSwiftPackageReference "../../AstuteMemory" */;
+			productName = AstuteMemory;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

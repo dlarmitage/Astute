@@ -8,6 +8,7 @@
 import SwiftUI
 import SwiftData
 import AstuteVoiceEngine
+import AstuteMemory
 
 struct ConversationView: View {
     @Environment(\.modelContext) private var modelContext
@@ -24,9 +25,11 @@ struct ConversationView: View {
     @State private var delegateBridge: ConversationBridge?
 
     let conversation: Conversation
+    private let apiKey: String
 
     init(conversation: Conversation, apiKey: String) {
         self.conversation = conversation
+        self.apiKey = apiKey
         let voice = UserDefaults.standard.string(forKey: "ai_voice") ?? "alloy"
         let config = VoiceEngineConfiguration(
             apiKey: apiKey,
@@ -168,6 +171,13 @@ struct ConversationView: View {
         }
         .onDisappear {
             voiceEngine.stop()
+            // Generate summary and title in background after leaving
+            let conv = conversation
+            let key = apiKey
+            let context = modelContext
+            Task.detached { @MainActor in
+                await generateMemory(for: conv, apiKey: key, modelContext: context)
+            }
         }
     }
 
@@ -212,6 +222,9 @@ struct ConversationView: View {
             }
 
             do {
+                // Set context BEFORE connecting so the initial session.update
+                // includes conversation memory (avoids race with sendSessionUpdate)
+                injectConversationContext()
                 try await voiceEngine.start()
                 isRecording = true
             } catch {
@@ -246,6 +259,7 @@ struct ConversationView: View {
                         isSendingText = false
                         return
                     }
+                    injectConversationContext()
                     try await voiceEngine.start()
                     isRecording = true
                     isSendingText = false
@@ -255,6 +269,67 @@ struct ConversationView: View {
             }
         }
     }
+
+    // MARK: - Memory
+
+    private static let baseInstructions = """
+        You are a helpful and friendly AI assistant. You respond naturally via voice \
+        and text. Keep your responses concise but engaging.
+        """
+
+    private func injectConversationContext() {
+        let descriptor = FetchDescriptor<Conversation>(
+            sortBy: [SortDescriptor(\Conversation.timestamp, order: .reverse)]
+        )
+        let allConversations = (try? modelContext.fetch(descriptor)) ?? []
+        let sortedMessages = conversation.messages.sorted { $0.timestamp < $1.timestamp }
+
+        let instructions = ContextBuilder.buildInstructions(
+            baseInstructions: Self.baseInstructions,
+            currentMessages: sortedMessages,
+            pastConversations: allConversations.filter { $0.id != conversation.id }
+        )
+
+        voiceEngine.updateInstructions(instructions)
+    }
+}
+
+// MARK: - Memory Generation (free function for Task.detached)
+
+@MainActor
+private func generateMemory(
+    for conversation: Conversation,
+    apiKey: String,
+    modelContext: ModelContext
+) async {
+    let sortedMessages = conversation.messages.sorted { $0.timestamp < $1.timestamp }
+
+    if conversation.summary == nil && sortedMessages.count >= 2 {
+        do {
+            let summary = try await Summarizer.summarize(
+                messages: sortedMessages,
+                apiKey: apiKey
+            )
+            conversation.summary = summary
+        } catch {
+            print("[Astute] Summarization failed: \(error.localizedDescription)")
+        }
+    }
+
+    if !conversation.isTitleGenerated && !sortedMessages.isEmpty {
+        do {
+            let title = try await TitleGenerator.generateTitle(
+                messages: sortedMessages,
+                apiKey: apiKey
+            )
+            conversation.title = title
+            conversation.isTitleGenerated = true
+        } catch {
+            print("[Astute] Title generation failed: \(error.localizedDescription)")
+        }
+    }
+
+    try? modelContext.save()
 }
 
 // MARK: - Delegate Bridge
@@ -282,8 +357,8 @@ private class ConversationBridge: VoiceEngineDelegate {
             modelContext.insert(userMessage)
             lastUserMessage = userMessage
 
-            // Auto-title from first user message (skip placeholder)
-            if conversation.title == "New Conversation" && transcript != "…" {
+            // Temporary title until AI generates one on conversation end
+            if conversation.title == "New Conversation" && !conversation.isTitleGenerated && transcript != "…" {
                 conversation.title = String(transcript.prefix(50))
             }
 
@@ -302,8 +377,9 @@ private class ConversationBridge: VoiceEngineDelegate {
     func voiceEngine(_ engine: VoiceEngine, didUpdateUserMessage transcript: String) {
         guard let msg = lastUserMessage, !transcript.isEmpty else { return }
         msg.content = transcript
-        // Update title if it was still placeholder
-        if conversation.title == "New Conversation" || conversation.title == "…" {
+        // Update temporary title if it was still placeholder
+        if (conversation.title == "New Conversation" || conversation.title == "…")
+            && !conversation.isTitleGenerated {
             conversation.title = String(transcript.prefix(50))
         }
         try? modelContext.save()
